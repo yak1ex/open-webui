@@ -2524,13 +2524,13 @@ Your task is to choose and return the correct tool(s) from the list of available
 
 - If one or more tools match the query, construct a JSON response containing a "tool_calls" array with objects that include:
    - "name": The tool's name.
-   - "parameters": A dictionary of required parameters and their corresponding values.
+   - "arguments": A dictionary of required parameters and their corresponding values.
 
 The format for the JSON response is strictly:
 {
   "tool_calls": [
-    {"name": "toolName1", "parameters": {"key1": "value1"}},
-    {"name": "toolName2", "parameters": {"key2": "value2"}}
+    {"name": "toolName1", "arguments": {"key1": "value1"}},
+    {"name": "toolName2", "arguments": {"key2": "value2"}}
   ]
 }"""
 

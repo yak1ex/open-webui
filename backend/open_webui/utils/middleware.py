@@ -1106,7 +1106,7 @@ async def chat_completion_tools_handler(
                     log.warning(f'Tool "{tool_function_name}" not found')
                     return
 
-                tool_function_params = tool_call.get('parameters', {})
+                tool_function_params = tool_call.get("parameters", tool_call.get("arguments", {}))
 
                 tool = None
                 tool_type = ''
