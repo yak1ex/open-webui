@@ -11,6 +11,7 @@
 	export let src = '';
 	export let alt = '';
 	export let allowExternal = false;
+	export let title = undefined;
 
 	export let className = ` w-full ${($settings?.highContrastMode ?? false) ? '' : 'outline-hidden focus:outline-hidden'}`;
 
@@ -45,7 +46,7 @@
 </script>
 
 {#if !failed}
-	<ImagePreview bind:show={showImagePreview} src={_src} {alt} />
+	<ImagePreview bind:show={showImagePreview} src={_src} {alt} {title} />
 {/if}
 
 <div class=" relative group w-fit flex items-center">
@@ -73,6 +74,7 @@
 			<img
 				src={_src}
 				{alt}
+				{title}
 				class={imageClassName}
 				draggable="false"
 				data-cy="image"

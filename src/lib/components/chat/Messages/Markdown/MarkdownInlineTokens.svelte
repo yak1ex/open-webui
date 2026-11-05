@@ -134,11 +134,11 @@
 			{#await terminalDocument.resolveImage(token.href)}
 				<span class="text-xs text-gray-400">{token.text}</span>
 			{:then url}
-				{#if url}<img src={url} alt={token.text} data-terminal-resolved="true" />{:else}<span
+				{#if url}<img src={url} alt={token.text} title={token.title ?? undefined} data-terminal-resolved="true" />{:else}<span
 						class="text-xs text-gray-400">Image unavailable: {token.text}</span
 					>{/if}
 			{/await}
-		{:else}<Image src={token.href} alt={token.text} allowExternal={true} />{/if}
+		{:else}<Image src={token.href} alt={token.text} allowExternal={true} title={token.title ?? undefined} />{/if}
 	{:else if token.type === 'strong'}
 		<strong
 			><svelte:self id={`${id}-strong`} tokens={token.tokens} {sourceIds} {onSourceClick} /></strong

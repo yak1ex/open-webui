@@ -14,6 +14,7 @@
 	export let show = false;
 	export let src = '';
 	export let alt = '';
+	export let title  = undefined;
 
 	const i18n = getContext('i18n');
 
@@ -184,7 +185,7 @@
 			</div>
 		</div>
 		<PanzoomContainer className="flex h-full max-h-full justify-center items-center z-0">
-			<img {src} {alt} class=" mx-auto h-full object-scale-down select-none" draggable="false" />
+			<img {src} {alt} {title} class=" mx-auto h-full object-scale-down select-none" draggable="false" />
 		</PanzoomContainer>
 	</div>
 {/if}
