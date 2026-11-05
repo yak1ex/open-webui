@@ -557,11 +557,23 @@ async def upload_image(request, image_data, content_type, metadata, user, db=Non
             )
 
     url = request.app.url_path_for('get_file_content_by_id', id=file_item.id)
+    data = (file_item.meta or {}).get('data')
+    prompt = data.get('prompt')
+    if prompt is None:
+        prompt = (data.get('instances') or {}).get('prompt')
+    if prompt is None:
+        prompt = '\n'.join(
+            part['text']
+            for content in data.get('contents') or []
+            for part in content.get('parts') or []
+            if isinstance(part.get('text'), str)
+        ) or None
     return file_item, {
         'id': file_item.id,
         'url': url,
         'name': (file_item.meta or {}).get('name') or file_item.filename,
         'content_type': (file_item.meta or {}).get('content_type'),
+        'prompt': prompt,
     }
 
 
