@@ -1024,7 +1024,7 @@ async def chat_completion_tools_handler(
             content = response['choices'][0]['message']['content']
         return content
 
-    def get_tools_function_calling_payload(messages, task_model_id, content):
+    def get_tools_function_calling_payload(messages, task_model_id, content, system):
         user_message = get_last_user_message(messages)
 
         if user_message and messages and messages[-1]['role'] == 'user':
@@ -1035,6 +1035,8 @@ async def chat_completion_tools_handler(
         chat_history = '\n'.join(
             f'{message["role"].upper()}: """{get_content_from_message(message)}"""' for message in recent_messages
         )
+        if system:
+            chat_history=f"SYSTEM: \"\"\"{system}\"\"\"\n{chat_history}"
 
         prompt = f'History:\n{chat_history}\nQuery: {user_message}' if chat_history else f'Query: {user_message}'
 
@@ -1078,7 +1080,9 @@ async def chat_completion_tools_handler(
         template = DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE
 
     tools_function_calling_prompt = tools_function_calling_generation_template(template, tools_specs)
-    payload = get_tools_function_calling_payload(body['messages'], task_model_id, tools_function_calling_prompt)
+    payload = get_tools_function_calling_payload(
+        body["messages"], task_model_id, tools_function_calling_prompt, body["metadata"]["model"].get('info',{}).get('params',{}).get('system', None)
+    )
 
     try:
         response = await generate_chat_completion(request, form_data=payload, user=user)
