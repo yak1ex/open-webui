@@ -371,6 +371,7 @@ async def fetch_url(
 async def generate_image(
     prompt: str,
     size: Optional[str] = None,
+    negative_prompt: Optional[str] = None,
     __request__: Request = None,
     __user__: dict = None,
     __event_emitter__: callable = None,
@@ -385,6 +386,7 @@ async def generate_image(
     :param prompt: A detailed description of the image to generate
     :param size: Optional output size in WIDTHxHEIGHT pixels (e.g. "1536x1024"), supported by the configured image model.
         Omit to use the configured default.
+    :param negative_prompt: Optional description of elements to exclude from the image. Ignored by backends that do not support negative prompts.
     :return: Image URLs and, when a terminal is selected, terminal_path for display_file or further processing.
     """
     if __request__ is None:
@@ -395,7 +397,7 @@ async def generate_image(
 
         images = await image_generations(
             request=__request__,
-            form_data=CreateImageForm(prompt=prompt, size=size),
+            form_data=CreateImageForm(prompt=prompt, size=size, negative_prompt=negative_prompt),
             metadata=(
                 {'channel_id': __chat_id__.removeprefix('channel:'), 'message_id': __message_id__}
                 if isinstance(__chat_id__, str) and __chat_id__.startswith('channel:')
