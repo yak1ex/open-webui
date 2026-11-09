@@ -736,7 +736,13 @@
 								{#each message.files.filter((f) => ['image', 'file'].includes(f.type)) as file}
 									<div>
 										{#if file.type === 'image' || (file?.content_type ?? '').startsWith('image/')}
-											<Image src={file.url} alt={file.name || $i18n.t('Generated Image')} title={file.prompt ?? undefined} />
+											<Image
+												src={file.url}
+												alt={file.name || $i18n.t('Generated Image')}
+												title={file.negative_prompt
+													? `${file.prompt ?? ''}\nNegative prompt: ${file.negative_prompt}`
+													: (file.prompt ?? undefined)}
+											/>
 										{:else}
 											<FileItem
 												item={file}

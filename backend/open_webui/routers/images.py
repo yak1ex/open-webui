@@ -574,6 +574,7 @@ async def upload_image(request, image_data, content_type, metadata, user, db=Non
         'name': (file_item.meta or {}).get('name') or file_item.filename,
         'content_type': (file_item.meta or {}).get('content_type'),
         'prompt': prompt,
+        'negative_prompt': data.get('negative_prompt'),
     }
 
 
