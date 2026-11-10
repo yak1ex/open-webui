@@ -372,6 +372,8 @@ async def generate_image(
     prompt: str,
     size: Optional[str] = None,
     negative_prompt: Optional[str] = None,
+    n: Optional[int] = None,
+    seed: Optional[int] = None,
     __request__: Request = None,
     __user__: dict = None,
     __event_emitter__: callable = None,
@@ -387,6 +389,8 @@ async def generate_image(
     :param size: Optional output size in WIDTHxHEIGHT pixels (e.g. "1536x1024"), supported by the configured image model.
         Omit to use the configured default.
     :param negative_prompt: Optional description of elements to exclude from the image. Ignored by backends that do not support negative prompts.
+    :param n: Number of images to generate, at least 1. Omit to use the backend default (normally 1). An explicit value overrides the configured AUTOMATIC1111 batch size.
+    :param seed: AUTOMATIC1111 only: integer from 0 to 4294967295, or -1 for a random seed. Omit to use the backend default. Reuse a seed across related calls; obtain a fresh random integer with execute_code for a new set. A batch normally increments seeds; sharing one seed within a batch requires backend configuration such as Dynamic Prompts Fixed seed.
     :return: Image URLs and, when a terminal is selected, terminal_path for display_file or further processing.
     """
     if __request__ is None:
@@ -397,7 +401,13 @@ async def generate_image(
 
         images = await image_generations(
             request=__request__,
-            form_data=CreateImageForm(prompt=prompt, size=size, negative_prompt=negative_prompt),
+            form_data=CreateImageForm(
+                prompt=prompt,
+                size=size,
+                negative_prompt=negative_prompt,
+                **({'n': n} if n is not None else {}),
+                **({'seed': seed} if seed is not None else {}),
+            ),
             metadata=(
                 {'channel_id': __chat_id__.removeprefix('channel:'), 'message_id': __message_id__}
                 if isinstance(__chat_id__, str) and __chat_id__.startswith('channel:')

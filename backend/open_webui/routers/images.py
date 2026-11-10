@@ -45,7 +45,7 @@ from open_webui.utils.images.comfyui import (
 from open_webui.utils.json_codec import JSONCodec
 from open_webui.utils.session_pool import get_session
 from PIL import Image, ImageOps
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 log = logging.getLogger(__name__)
@@ -447,7 +447,8 @@ class CreateImageForm(BaseModel):
     model: str | None = None
     prompt: str
     size: str | None = None
-    n: int = 1
+    n: int = Field(default=1, ge=1)
+    seed: int | None = Field(default=None, ge=-1, le=4294967295)
     steps: int | None = None
     negative_prompt: str | None = None
 
@@ -619,6 +620,8 @@ async def image_generations(
     user=None,
 ):
     image_config = await get_image_config()
+    if form_data.seed is not None and image_config.IMAGE_GENERATION_ENGINE not in ('automatic1111', ''):
+        raise HTTPException(status_code=400, detail='Explicit image seeds are supported only by AUTOMATIC1111.')
     # if IMAGE_SIZE = 'auto', default WidthxHeight to the 512x512 default
     # This is only relevant when the user has set IMAGE_SIZE to 'auto' with an
     # image model other than gpt-image-1, which is warned about on settings save
@@ -833,6 +836,13 @@ async def image_generations(
 
             if image_config.AUTOMATIC1111_PARAMS:
                 data = {**data, **image_config.AUTOMATIC1111_PARAMS}
+
+            # Explicit per-call controls override administrator defaults. Preserve
+            # configured batch_size and seed when these controls were omitted.
+            if 'n' in form_data.model_fields_set:
+                data['batch_size'] = form_data.n
+            if form_data.seed is not None:
+                data['seed'] = form_data.seed
 
             session = await get_session()
             async with session.post(
